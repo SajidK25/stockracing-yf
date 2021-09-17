@@ -1,0 +1,7 @@
+lxml
+requests
+psycopg2-binary
+flask
+js2xml
+protobuf
+websocket-client

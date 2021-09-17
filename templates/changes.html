@@ -1,0 +1,26 @@
+<html>
+  <meta http-equiv="Refresh" content="60">
+  <body>
+    <h1>Changes</h1>
+    <div><a href="/changes?data=gainers">Gainers</a></div>
+    <div><a href="/changes?data=losers">Losers</a></div>
+    <table border="1px solid black">
+      <tbody>
+        <tr>
+          <th>Ticker</th>
+          <th>Price</th>
+          <th>Change</th>
+          <th>Volume</th>
+        </tr>
+        {% for row_dict in rows %}
+        <tr>
+          <td>{{ row_dict.ticker }}</td>
+          <td>{{ row_dict.cur_price }}</td>
+          <td>{{ row_dict.cur_price - row_dict.prev_price }}</td>
+          <td>{{ row_dict.volume }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </body>
+</html>
