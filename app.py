@@ -155,6 +155,83 @@ def get_racing():
 
     return render_template("racing.html", rows=rows)
 
+@app.route("/gapper")
+def get_gapper():
+    table = "gainer_timeseries"
+
+    data = request.args.get("data")
+
+    if data == "losers":
+        table = "loser_timeseries"
+
+    db_conn = prepare_db()
+
+    cursor = db_conn.cursor()
+
+    rows = []
+
+    tickers = []
+
+    # FIXME: code duplication with get_changes and bad perf.
+    cursor.execute("SELECT DISTINCT ON (ticker) ticker FROM {}".format(table))
+
+    for r in cursor.fetchall():
+        tickers.append(r[0])
+
+    for t in tickers:
+        cursor.execute(
+            "SELECT price, volume, timestamp FROM {} WHERE ticker='{}' ORDER BY timestamp DESC LIMIT 1;".format(
+                table, t
+            )
+        )
+
+        r = cursor.fetchone()
+        if r is not None:
+            row = {
+                "ticker": t,
+                "cur_price": r[0],
+                "volume": r[1],
+            }
+
+            rows.append(row)
+
+    for row in rows:
+        t = row["ticker"]
+
+        five_minutes_ago = datetime.now() - timedelta(minutes=5)
+        five_minutes_ago = math.ceil(five_minutes_ago.timestamp())
+
+        cursor.execute(
+            "SELECT price FROM {} WHERE ticker='{}' AND timestamp < {} ORDER BY timestamp DESC LIMIT 1;".format(
+                table, t, five_minutes_ago
+            )
+        )
+
+        r = cursor.fetchone()
+        if r is not None:
+            row["prev_price"] = r[0]
+        else:
+            row["prev_price"] = -1
+
+    cursor.close()
+
+    sorted_rows1 = sorted(rows, key=lambda row: row.get("cur_price"), reverse=True)
+    sorted_rows2 = sorted(rows, key=lambda row: row.get("prev_price"), reverse=True)
+
+    for i in range(len(sorted_rows1)):
+        row = sorted_rows1[i]
+        row["cur_pos"] = i + 1
+
+    for i in range(len(sorted_rows2)):
+        row = sorted_rows2[i]
+        row["prev_pos"] = i + 1
+
+    for i in rows:
+        row["gapper"] = row["prev_pos"] - row["cur_pos"]
+
+    rows = sorted(rows, key=lambda row: row.get("gapper"))
+
+    return render_template("gapper.html", rows=rows)
 
 @app.route("/")
 def index():

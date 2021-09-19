@@ -1,0 +1,46 @@
+<html>
+<meta http-equiv="Refresh" content="300" />
+
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css"
+        crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.2/css/dataTables.bootstrap4.min.css"
+        crossorigin="anonymous">
+    <script>
+        $(document).ready(function () {
+            $('#gainers').DataTable();
+        });
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Gapper</h1>
+        <div><a href="/gapper?data=gainers">Gainers</a></div>
+        <div><a href="/gapper?data=losers">Losers</a></div>
+        <table id="gainers" class="table table-striped table-bordered" style="width: 100%">
+            <thead>
+                <tr>
+                    <th>Symbol</th>
+                    <th>Price</th>
+                    <th>Previous position</th>
+                    <th>Current position</th>
+                    <th>Gapper</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row_dict in rows %}
+                <tr>
+                    <td>{{ row_dict.ticker }}</td>
+                    <td>{{ row_dict.cur_price }}</td>
+                    <td>{{ row_dict.prev_pos }}</td>
+                    <td>{{ row_dict.cur_pos }}</td>
+                    <td>{{ row_dict.gapper }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+
+</html>
