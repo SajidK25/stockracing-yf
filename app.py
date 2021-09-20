@@ -226,7 +226,7 @@ def get_gapper():
         row = sorted_rows2[i]
         row["prev_pos"] = i + 1
 
-    for i in rows:
+    for row in rows:
         row["gapper"] = row["prev_pos"] - row["cur_pos"]
 
     rows = sorted(rows, key=lambda row: row.get("gapper"))
