@@ -41,7 +41,9 @@
     <script src='https://cdn.datatables.net/responsive/1.0.4/js/dataTables.responsive.js'></script>
     <script>
         $(document).ready(function () {
-            $('#changes').DataTable();
+            $('#changes').DataTable({
+              "pageLength": 50
+            });
         });
     </script>
 </body>
