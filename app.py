@@ -114,7 +114,7 @@ def get_racing():
         if r is not None:
             row = {
                 "ticker": t,
-                "cur_price": r[0],
+                "cur_price": round(r[0],3),
                 "volume": r[1],
             }
 
@@ -189,7 +189,7 @@ def get_gapper():
         if r is not None:
             row = {
                 "ticker": t,
-                "cur_price": r[0],
+                "cur_price": round(r[0],3),
                 "volume": r[1],
             }
 
