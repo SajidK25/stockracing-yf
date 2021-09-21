@@ -296,7 +296,8 @@ def run_loop(screener_url, json_dict, db_table):
             )
 
             cursor.execute("COMMIT")
-
+            db_conn.commit()
+            
             now = datetime.now()
             delta = now - tickers_refreshed_at
 
