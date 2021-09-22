@@ -194,7 +194,8 @@ def get_tickers(session, screener_url, json_dict):
 
     for quote_dict in quotes:
         symbol = quote_dict.get("symbol")
-        tickers.append(symbol)
+        if len(symbol) <= 4:
+            tickers.append(symbol)
 
     return tickers
 
