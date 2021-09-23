@@ -324,8 +324,8 @@ def main():
         level=logging.DEBUG,
     )
 
-    tw = threading.Thread(target=run_loop_winner)
-    tl = threading.Thread(target=run_loop_loser)
+    tw = threading.Thread(target=run_loop_winner, daemon=True)
+    tl = threading.Thread(target=run_loop_loser, daemon=True)
 
     logging.info("Launching run loop threads...")
 
