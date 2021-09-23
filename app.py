@@ -187,6 +187,8 @@ def get_gapper():
 
         r = cursor.fetchone()
         if r is not None:
+            if round(r[0],3) < 100 or round(r[0],3) > 500:
+                continue
             row = {
                 "ticker": t,
                 "cur_price": round(r[0],3),

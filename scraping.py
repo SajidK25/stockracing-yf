@@ -309,11 +309,13 @@ def run_loop(screener_url, json_dict, db_table):
 
 
 def run_loop_winner():
-    run_loop(TOP_GAINER_SCREENER_URL, TOP_GAINER_JSON_DICT, "gainer_timeseries")
+    while True:
+        run_loop(TOP_GAINER_SCREENER_URL, TOP_GAINER_JSON_DICT, "gainer_timeseries")
 
 
 def run_loop_loser():
-    run_loop(TOP_LOSER_SCREENER_URL, TOP_LOSER_JSON_DICT, "loser_timeseries")
+    while True:
+        run_loop(TOP_LOSER_SCREENER_URL, TOP_LOSER_JSON_DICT, "loser_timeseries")
 
 
 def main():
@@ -322,8 +324,8 @@ def main():
         level=logging.DEBUG,
     )
 
-    tw = threading.Thread(target=run_loop_winner, daemon=True)
-    tl = threading.Thread(target=run_loop_loser, daemon=True)
+    tw = threading.Thread(target=run_loop_winner)
+    tl = threading.Thread(target=run_loop_loser)
 
     logging.info("Launching run loop threads...")
 
