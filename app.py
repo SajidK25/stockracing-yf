@@ -290,6 +290,8 @@ def get_volatility():
             if r is not None:
                 row["prev_price"] = r[0]
                 row["price_change"] = round(abs(row["cur_price"] - row["prev_price"]),3)
+                row["prev_price"] = round(row["prev_price"],3)
+                row["cur_price"] = round(row["cur_price"],3)
                 new_rows.append(row)
             else:
                 row["prev_price"] = -1
