@@ -292,7 +292,7 @@ def get_volatility():
                 row["price_change"] = round(abs(row["cur_price"] - row["prev_price"]),3)
             else:
                 row["prev_price"] = -1
-                rows.remove(r)
+                rows.remove(row)
 
     cursor.close()
 
