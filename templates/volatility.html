@@ -12,14 +12,12 @@
 
 <body>
     <div class="container">
-        <h1>Gapper</h1>
-        <div><a href="/gapper?data=gainers">Gainers</a></div>
-        <div><a href="/gapper?data=losers">Losers</a></div>
-        <table id="gainers" class="table table-striped table-bordered" style="width: 100%">
+        <h1>Volatility</h1>
+        <table id="volatility" class="table table-striped table-bordered" style="width: 100%">
             <thead>
                 <tr>
                     <th>Symbol</th>
-                    <th>Cureent Price</th>
+                    <th>Current Price</th>
                     <th>Previous Price</th>
                     <th>Price Change</th>
                 </tr>
@@ -43,8 +41,8 @@
     <script src='https://cdn.datatables.net/responsive/1.0.4/js/dataTables.responsive.js'></script>
     <script>
         $(document).ready(function () {
-            $('#gainers').DataTable({
-                "order" : [[4,"desc"]],
+            $('#volatility').DataTable({
+                "order" : [[3,"desc"]],
                 "pageLength": 50
             });
         });
