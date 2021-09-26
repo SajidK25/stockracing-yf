@@ -273,7 +273,7 @@ def get_volatility():
                 }
 
                 rows.append(row)
-
+        new_rows = []
         for row in rows:
             t = row["ticker"]
 
@@ -290,12 +290,12 @@ def get_volatility():
             if r is not None:
                 row["prev_price"] = r[0]
                 row["price_change"] = round(abs(row["cur_price"] - row["prev_price"]),3)
+                new_rows.append(row)
             else:
                 row["prev_price"] = -1
-                rows.remove(row)
 
     cursor.close()
-
+    rows = new_rows
 
     rows = sorted(rows, key=lambda row: row.get("price_change"))
 
