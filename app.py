@@ -235,6 +235,71 @@ def get_gapper():
 
     return render_template("gapper.html", rows=rows)
 
+
+@app.route("/volatility")
+def get_volatility():
+    tables = ["gainer_timeseries","loser_timeseries"]
+    
+    db_conn = prepare_db()
+
+    cursor = db_conn.cursor()
+
+    rows = []
+
+    tickers = []
+
+    for table in tables:
+        # FIXME: code duplication with get_changes and bad perf.
+        cursor.execute("SELECT DISTINCT ON (ticker) ticker FROM {}".format(table))
+
+        for r in cursor.fetchall():
+            tickers.append(r[0])
+
+        for t in tickers:
+            cursor.execute(
+                "SELECT price, volume, timestamp FROM {} WHERE ticker='{}' ORDER BY timestamp DESC LIMIT 1;".format(
+                    table, t
+                )
+            )
+
+            r = cursor.fetchone()
+            if r is not None:
+                if round(r[0],3) < 100 or round(r[0],3) > 500:
+                    continue
+                row = {
+                    "ticker": t,
+                    "cur_price": r[0],
+                    "volume": r[1],
+                }
+
+                rows.append(row)
+
+        for row in rows:
+            t = row["ticker"]
+
+            five_minutes_ago = datetime.now() - timedelta(minutes=5)
+            five_minutes_ago = math.ceil(five_minutes_ago.timestamp())
+
+            cursor.execute(
+                "SELECT price FROM {} WHERE ticker='{}' AND timestamp < {} ORDER BY timestamp DESC LIMIT 1;".format(
+                    table, t, five_minutes_ago
+                )
+            )
+
+            r = cursor.fetchone()
+            if r is not None:
+                row["prev_price"] = r[0]
+                row["price_change"] = round(abs(row["cur_price"] - row["prev_price"]),3)
+            else:
+                row["prev_price"] = -1
+
+    cursor.close()
+
+
+    rows = sorted(rows, key=lambda row: row.get("price_change"))
+
+    return render_template("volatility.html", rows=rows)
+
 @app.route("/")
 def index():
     return render_template("index.html")
