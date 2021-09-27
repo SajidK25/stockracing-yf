@@ -196,6 +196,14 @@ def get_tickers(session, screener_url, json_dict):
         symbol = quote_dict.get("symbol")
         if len(symbol) <= 4:
             tickers.append(symbol)
+        
+    db_conn = prepare_db()
+    cursor = db_conn.cursor()
+    for table in ["gainer_timeseries","loser_timeseries"]:
+        cursor.execute("SELECT DISTINCT ON (ticker) ticker FROM {}".format(table))
+        for r in cursor.fetchall():
+            if r not in tickers:
+                tickers.append(r[0])
 
     return tickers
 
