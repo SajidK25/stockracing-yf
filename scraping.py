@@ -285,24 +285,32 @@ def run_loop(screener_url, json_dict, db_table):
             volume = pricing_data.dayVolume
 
             cursor.execute("BEGIN")
-
-            cursor.execute(
-                "DELETE FROM {} WHERE ticker='{}' AND timestamp={}".format(
-                    db_table, ticker, timestamp
+            try:
+                cursor.execute(
+                    "DELETE FROM {} WHERE ticker='{}' AND timestamp={}".format(
+                        db_table, ticker, timestamp
+                    )
                 )
-            )
+            except Exception:
+                print(Exception, "Exception occured -1")
 
-            cursor.execute(
-                "INSERT INTO {} (ticker, price, timestamp, volume) VALUES ('{}', {}, {}, {})".format(
-                    db_table, ticker, price, timestamp, volume
+            try:
+                cursor.execute(
+                    "INSERT INTO {} (ticker, price, timestamp, volume) VALUES ('{}', {}, {}, {})".format(
+                        db_table, ticker, price, timestamp, volume
+                    )
                 )
-            )
+            except Exception:
+                print(Exception, "Exception occured - 2")
 
-            cursor.execute(
-                "DELETE FROM {} WHERE ticker='{}' AND timestamp < {}".format(
-                    db_table, ticker, timestamp - 10 * 60
+            try:    
+                cursor.execute(
+                    "DELETE FROM {} WHERE ticker='{}' AND timestamp < {}".format(
+                        db_table, ticker, timestamp - 10 * 60
+                    )
                 )
-            )
+            except Exception:
+                print(Exception, "Exception occured - 3")
 
             cursor.execute("COMMIT")
             db_conn.commit()
