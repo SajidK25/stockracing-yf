@@ -144,7 +144,7 @@ def create_yahoo_session():
     return session
 
 
-def get_tickers(session, screener_url, json_dict):
+def get_tickers(session, screener_url, json_dict,db_table):
     tickers = []
 
     resp0 = session.get(screener_url)
@@ -199,7 +199,8 @@ def get_tickers(session, screener_url, json_dict):
         
     db_conn = prepare_db()
     cursor = db_conn.cursor()
-    for table in ["gainer_timeseries","loser_timeseries"]:
+    if db_table:
+        table = db_table
         cursor.execute("SELECT DISTINCT ON (ticker) ticker FROM {}".format(table))
         for r in cursor.fetchall():
             if r not in tickers:
@@ -243,7 +244,7 @@ def run_loop(screener_url, json_dict, db_table):
 
     while True:
         try:
-            tickers = get_tickers(session, screener_url, json_dict)
+            tickers = get_tickers(session, screener_url, json_dict,db_table)
         except Exception as e:
             session = create_yahoo_session()
             logging.error(e)
