@@ -284,7 +284,8 @@ def run_loop(screener_url, json_dict, db_table):
             price = pricing_data.price
             timestamp = round(pricing_data.time / 1000)
             volume = pricing_data.dayVolume
-
+            if price < 100 or price > 1000:
+                continue
             cursor.execute("BEGIN")
             try:
                 cursor.execute(

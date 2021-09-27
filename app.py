@@ -187,7 +187,7 @@ def get_gapper():
 
         r = cursor.fetchone()
         if r is not None:
-            if round(r[0],3) < 100 or round(r[0],3) > 500:
+            if round(r[0],3) < 100 or round(r[0],3) > 1000:
                 continue
             row = {
                 "ticker": t,
@@ -264,7 +264,7 @@ def get_volatility():
 
             r = cursor.fetchone()
             if r is not None:
-                if round(r[0],3) < 100 or round(r[0],3) > 500:
+                if round(r[0],3) < 100 or round(r[0],3) > 1000:
                     continue
                 row = {
                     "ticker": t,
