@@ -16,7 +16,7 @@ import psycopg2
 from lxml import html
 import js2xml
 import websocket
-
+import pymongo
 from PricingData_pb2 import *
 
 config = configparser.ConfigParser()
@@ -197,12 +197,13 @@ def get_tickers(session, screener_url, json_dict,db_table):
         if len(symbol) <= 4:
             tickers.append(symbol)
         
-    db_conn = prepare_db()
-    cursor = db_conn.cursor()
+    db = prepare_db()
+    # cursor = db_conn.cursor()
+
     if db_table:
-        table = db_table
-        cursor.execute("SELECT DISTINCT ON (ticker) ticker FROM {}".format(table))
-        for r in cursor.fetchall():
+        # table = db_table
+        # cursor.execute("SELECT DISTINCT ON (ticker) ticker FROM {}".format(table))
+        for r in db[db_table].distinct('ticker'):
             if r not in tickers:
                 tickers.append(r[0])
 
@@ -210,6 +211,9 @@ def get_tickers(session, screener_url, json_dict,db_table):
 
 
 def prepare_db():
+    client = pymongo.MongoClient("mongodb+srv://main:sPohhl8doYXHuah6@cluster0.92gdy.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+    db = client.stockdata
+    return db
     if os.environ.get("DATABASE_URL") is not None:
         DATABASE_URL = os.environ["DATABASE_URL"]
         db_conn = psycopg2.connect(DATABASE_URL, sslmode="require")
@@ -237,8 +241,8 @@ def prepare_db():
 
 
 def run_loop(screener_url, json_dict, db_table):
-    db_conn = prepare_db()
-    cursor = db_conn.cursor()
+    db = prepare_db()
+    # cursor = db_conn.cursor()
 
     session = create_yahoo_session()
 
@@ -286,36 +290,47 @@ def run_loop(screener_url, json_dict, db_table):
             volume = pricing_data.dayVolume
             if price < 100 or price > 1000:
                 continue
-            cursor.execute("BEGIN")
+            # cursor.execute("BEGIN")
             try:
-                cursor.execute(
-                    "DELETE FROM {} WHERE ticker='{}' AND timestamp={}".format(
-                        db_table, ticker, timestamp
-                    )
-                )
+                # cursor.execute(
+                #     "DELETE FROM {} WHERE ticker='{}' AND timestamp={}".format(
+                #         db_table, ticker, timestamp
+                #     )
+                # )
+                db[db_table].delete_many({"ticker":ticker,"timestamp":timestamp})
             except Exception:
                 print(Exception, "Exception occured -1")
 
             try:
-                cursor.execute(
-                    "INSERT INTO {} (ticker, price, timestamp, volume) VALUES ('{}', {}, {}, {})".format(
-                        db_table, ticker, price, timestamp, volume
-                    )
-                )
+                # cursor.execute(
+                #     "INSERT INTO {} (ticker, price, timestamp, volume) VALUES ('{}', {}, {}, {})".format(
+                #         db_table, ticker, price, timestamp, volume
+                #     )
+                # )
+                db[db_table].insert_one({
+                    "ticker":ticker,
+                    "price":price,
+                    "timestamp":timestamp,
+                    "volume":volume
+                })
             except Exception:
                 print(Exception, "Exception occured - 2")
 
             try:    
-                cursor.execute(
-                    "DELETE FROM {} WHERE ticker='{}' AND timestamp < {}".format(
-                        db_table, ticker, timestamp - 10 * 60
-                    )
-                )
+                # cursor.execute(
+                #     "DELETE FROM {} WHERE ticker='{}' AND timestamp < {}".format(
+                #         db_table, ticker, timestamp - 10 * 60
+                #     )
+                # )
+                result = db[db_table].delete_many({
+                    "timestamp" : {"$lt" : timestamp - 10 * 60 }
+                })
+                logging.info(f"Deleted {result.deleted_count} records")
             except Exception:
                 print(Exception, "Exception occured - 3")
 
-            cursor.execute("COMMIT")
-            db_conn.commit()
+            # cursor.execute("COMMIT")
+            # db_conn.commit()
             
             now = datetime.now()
             delta = now - tickers_refreshed_at
