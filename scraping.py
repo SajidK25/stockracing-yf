@@ -285,7 +285,7 @@ def run_loop(screener_url, json_dict, db_table):
             )
 
             ticker = pricing_data.id
-            price = pricing_data.price
+            price = round(pricing_data.price,3)
             timestamp = round(pricing_data.time / 1000)
             volume = pricing_data.dayVolume
             if price < 100 or price > 1000:
