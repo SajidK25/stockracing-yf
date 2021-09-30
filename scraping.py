@@ -343,8 +343,7 @@ def run_loop_winner():
 
 def run_loop_loser():
     while True:
-        # run_loop(TOP_LOSER_SCREENER_URL, TOP_LOSER_JSON_DICT, "loser_timeseries")
-        pass
+        run_loop(TOP_LOSER_SCREENER_URL, TOP_LOSER_JSON_DICT, "loser_timeseries")
 
 
 def main():

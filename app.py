@@ -309,6 +309,8 @@ def get_volatility():
                     "cur_price": ticker["price"],
                     "volume": ticker["volume"],
                 }
+                if row in rows:
+                    continue
                 rows.append(row)
         new_rows = []
         for row in rows:
@@ -343,6 +345,12 @@ def get_volatility():
     rows = new_rows
 
     rows = sorted(rows, key=lambda row: row.get("price_change"))
+    row_ticker = []
+    for index in range(len(rows)):
+        if rows[index]["ticker"] in row_ticker:
+            del rows[index]
+        else:
+            row_ticker.append(rows[index]["ticker"])
     client.close()
     return render_template("volatility.html", rows=rows)
 
