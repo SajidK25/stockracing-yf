@@ -235,7 +235,7 @@ def insert_db_gainer(ws,pricing_data):
     try:
         db[db_table].delete_many({"ticker":ticker,"timestamp":timestamp})
     except Exception:
-        print(Exception, "Exception occured -1")
+        logging.info(f"Exception occured -1 {Exception}")
 
     try:
         db[db_table].insert_one({
@@ -245,7 +245,8 @@ def insert_db_gainer(ws,pricing_data):
             "volume":volume
         })
     except Exception:
-        print(Exception, "Exception occured - 2")
+        logging.info(f"Exception occured -2 {Exception}")
+
 
     try:    
         result = db[db_table].delete_many({
@@ -253,7 +254,8 @@ def insert_db_gainer(ws,pricing_data):
         })
         logging.info(f"Deleted {result.deleted_count} records")
     except Exception:
-        print(Exception, "Exception occured - 3")
+        logging.info(f"Exception occured -3 {Exception}")
+
     client.close()
     now = datetime.now()
     delta = now - timing[db_table]
