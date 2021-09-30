@@ -9,7 +9,7 @@ import pymongo
 
 from flask import Flask, render_template, request
 
-from scraping import *
+from db import prepare_db
 
 app = Flask(__name__)
 
@@ -353,20 +353,20 @@ def index():
 
 
 def main():
-    logging.basicConfig(
-        format="%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s",
-        level=logging.DEBUG,
-    )
+    # logging.basicConfig(
+    #     format="%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s",
+    #     level=logging.DEBUG,
+    # )
 
-    tw = threading.Thread(target=run_loop_winner, daemon=True)
-    tl = threading.Thread(target=run_loop_loser, daemon=True)
+    # tw = threading.Thread(target=run_loop_winner, daemon=True)
+    # tl = threading.Thread(target=run_loop_loser, daemon=True)
 
     logging.info("Launching run loop threads...")
 
-    tw.start()
+    # tw.start()
 
-    t = threading.Timer(30.0, tl.start)
-    t.start()
+    # t = threading.Timer(30.0, tl.start)
+    # t.start()
 
     port = 80
     if os.environ.get("PORT") is not None:
