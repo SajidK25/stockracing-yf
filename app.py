@@ -23,7 +23,8 @@ def get_changes():
     if data == "losers":
         table = "loser_timeseries"
 
-    db_conn = prepare_db()
+    db_conn,client = prepare_db()
+
 
     # cursor = db_conn.cursor()
 
@@ -86,7 +87,7 @@ def get_changes():
     rows = sorted(
         rows, key=lambda row: row.get("cur_price") - row.get("prev_price"), reverse=True
     )
-
+    client.close()
     return render_template("changes.html", rows=rows)
 
 
@@ -99,7 +100,7 @@ def get_racing():
     if data == "losers":
         table = "loser_timeseries"
 
-    db_conn = prepare_db()
+    db_conn,client = prepare_db()
 
     # cursor = db_conn.cursor()
 
@@ -167,7 +168,7 @@ def get_racing():
         row["prev_pos"] = i + 1
 
     rows = sorted(rows, key=lambda row: row.get("cur_pos"))
-
+    client.close()
     return render_template("racing.html", rows=rows)
 
 
@@ -180,7 +181,7 @@ def get_gapper():
     if data == "losers":
         table = "loser_timeseries"
 
-    db_conn = prepare_db()
+    db_conn,client = prepare_db()
 
     # cursor = db_conn.cursor()
 
@@ -261,7 +262,7 @@ def get_gapper():
         row["gapper"] = row["prev_pos"] - row["cur_pos"]
 
     rows = sorted(rows, key=lambda row: row.get("gapper"))
-
+    client.close()
     return render_template("gapper.html", rows=rows)
 
 
@@ -269,7 +270,7 @@ def get_gapper():
 def get_volatility():
     tables = ["gainer_timeseries", "loser_timeseries"]
 
-    db_conn = prepare_db()
+    db_conn,client = prepare_db()
 
     # cursor = db_conn.cursor()
 
@@ -342,7 +343,7 @@ def get_volatility():
     rows = new_rows
 
     rows = sorted(rows, key=lambda row: row.get("price_change"))
-
+    client.close()
     return render_template("volatility.html", rows=rows)
 
 

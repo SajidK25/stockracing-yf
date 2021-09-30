@@ -197,7 +197,7 @@ def get_tickers(session, screener_url, json_dict,db_table):
         if len(symbol) <= 4:
             tickers.append(symbol)
         
-    db = prepare_db()
+    db,client = prepare_db()
     # cursor = db_conn.cursor()
 
     if db_table:
@@ -206,14 +206,14 @@ def get_tickers(session, screener_url, json_dict,db_table):
         for r in db[db_table].distinct('ticker'):
             if r not in tickers:
                 tickers.append(r[0])
-
+    client.close()
     return tickers
 
 
 def prepare_db():
     client = pymongo.MongoClient("mongodb+srv://main:sPohhl8doYXHuah6@cluster0.92gdy.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
     db = client.stockdata
-    return db
+    return (db,client)
     if os.environ.get("DATABASE_URL") is not None:
         DATABASE_URL = os.environ["DATABASE_URL"]
         db_conn = psycopg2.connect(DATABASE_URL, sslmode="require")
@@ -241,7 +241,7 @@ def prepare_db():
 
 
 def run_loop(screener_url, json_dict, db_table):
-    db = prepare_db()
+    db,client = prepare_db()
     # cursor = db_conn.cursor()
 
     session = create_yahoo_session()
@@ -337,6 +337,7 @@ def run_loop(screener_url, json_dict, db_table):
 
             if delta.total_seconds() > 10 * 60:
                 logging.info("10 minutes elapsed - refreshing ticker list")
+                client.close()
                 ws.close()
                 break
 
