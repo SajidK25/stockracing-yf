@@ -279,23 +279,13 @@ def get_volatility():
     tickers = []
 
     for table in tables:
+        tickers = []
+        table_rows = []
         # FIXME: code duplication with get_changes and bad perf.
-        # cursor.execute(
-        #     "SELECT DISTINCT ON (ticker) ticker FROM {}".format(table))
-
-        # for r in cursor.fetchall():
-        #     tickers.append(r[0])
         for ticker in db_conn[table].distinct('ticker'):
             tickers.append(ticker)
 
         for t in tickers:
-            # cursor.execute(
-            #     "SELECT price, volume, timestamp FROM {} WHERE ticker='{}' ORDER BY timestamp DESC LIMIT 1;".format(
-            #         table, t
-            #     )
-            # )
-
-            # r = cursor.fetchone()
             query = {
                 "$query": {"ticker": t},
                 "$orderby": {"timestamp": -1}
@@ -311,21 +301,14 @@ def get_volatility():
                 }
                 if row in rows:
                     continue
-                rows.append(row)
+                table_rows.append(row)
         new_rows = []
-        for row in rows:
+        for row in table_rows:
             t = row["ticker"]
 
             five_minutes_ago = datetime.now() - timedelta(minutes=5)
             five_minutes_ago = math.ceil(five_minutes_ago.timestamp())
 
-            # cursor.execute(
-            #     "SELECT price FROM {} WHERE ticker='{}' AND timestamp < {} ORDER BY timestamp DESC LIMIT 1;".format(
-            #         table, t, five_minutes_ago
-            #     )
-            # )
-
-            # ticker = cursor.fetchone()
             query = {
                 "$query": {"ticker": t, "timestamp": {"$lt": five_minutes_ago}},
                 "$orderby": {"timestamp": -1}
@@ -340,10 +323,7 @@ def get_volatility():
                 new_rows.append(row)
             else:
                 row["prev_price"] = -1
-
-    # cursor.close()
-    rows = new_rows
-
+        rows.extend(new_rows)
     rows = sorted(rows, key=lambda row: row.get("price_change"))
     row_ticker = []
     for index in range(len(rows)):
