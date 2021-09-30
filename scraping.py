@@ -318,8 +318,7 @@ def insert_db_loser(ws,pricing_data):
 timing = {}
 
 def onexit(*args, **kwargs):
-    print("Exiting")
-    print(kwargs)
+    logging.info("Exiting .....")
 
 def run_loop(screener_url, json_dict, db_table):
     session = create_yahoo_session()
