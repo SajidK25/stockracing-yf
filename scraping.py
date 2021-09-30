@@ -214,6 +214,12 @@ def get_tickers(session, screener_url, json_dict,db_table):
 
 def insert_db_gainer(ws,pricing_data):
     db_table = "gainer_timeseries"
+    now = datetime.now()
+    delta = now - timing[db_table]
+
+    if delta.total_seconds() > 10 * 60:
+        logging.info("10 minutes elapsed - refreshing ticker list")
+        ws.close()
     ticker = pricing_data["id"]
     price = round(pricing_data["price"],3)
     timestamp = round(pricing_data["timestamp"] / 1000)
@@ -257,16 +263,15 @@ def insert_db_gainer(ws,pricing_data):
         logging.info(f"Exception occured -3 {Exception}")
 
     client.close()
-    now = datetime.now()
-    delta = now - timing[db_table]
-
-    if delta.total_seconds() > 10 * 60:
-        logging.info("10 minutes elapsed - refreshing ticker list")
-        ws.close()
 
 def insert_db_loser(ws,pricing_data):
     db_table = "loser_timeseries"
-    
+    now = datetime.now()
+    delta = now - timing[db_table]
+
+    if delta.total_seconds() > 1 * 60:
+        logging.info("10 minutes elapsed - refreshing ticker list")
+        ws.close()
     ticker = pricing_data["id"]
     price = round(pricing_data["price"],3)
     timestamp = round(pricing_data["timestamp"] / 1000)
@@ -308,12 +313,7 @@ def insert_db_loser(ws,pricing_data):
     except Exception:
         print(Exception, "Exception occured - 3")
     client.close()
-    now = datetime.now()
-    delta = now - timing[db_table]
-
-    if delta.total_seconds() > 1 * 60:
-        logging.info("10 minutes elapsed - refreshing ticker list")
-        ws.close()
+    
 
 timing = {}
 
