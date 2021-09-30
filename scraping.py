@@ -30,7 +30,7 @@ USER_NAME = config["PostgreSQL"]["Username"]
 PASSWORD = config["PostgreSQL"]["Password"]
 DATABASE_NAME = config["PostgreSQL"]["Database"]
 
-TOP_GAINER_SCREENER_URL = "https://finance.yahoo.com/screener/predefined/day_gainers?offset=0&count=50&guccounter=1"
+TOP_GAINER_SCREENER_URL = "https://finance.yahoo.com/screener/predefined/day_gainers?offset=0&count=100&guccounter=1"
 TOP_GAINER_JSON_DICT = {
     "offset": 0,
     "size": 50,
@@ -71,7 +71,7 @@ TOP_GAINER_JSON_DICT = {
 }
 
 TOP_LOSER_SCREENER_URL = (
-    "https://finance.yahoo.com/screener/predefined/day_losers?offset=0&count=50"
+    "https://finance.yahoo.com/screener/predefined/day_losers?offset=0&count=100"
 )
 TOP_LOSER_JSON_DICT = {
     "offset": 0,
@@ -213,8 +213,14 @@ def get_tickers(session, screener_url, json_dict,db_table):
 
 
 def insert_db_gainer(ws,pricing_data):
-    db,client = prepare_db()
     db_table = "gainer_timeseries"
+    ticker = pricing_data["id"]
+    price = round(pricing_data["price"],3)
+    timestamp = round(pricing_data["timestamp"] / 1000)
+    volume = pricing_data["dayVolume"]
+    if price < 100 or price > 1000:
+        return
+    db,client = prepare_db()
     logging.info(
         "{} {} {} {} {}".format(
             datetime.utcfromtimestamp(pricing_data["timestamp"] / 1000).strftime(
@@ -226,12 +232,6 @@ def insert_db_gainer(ws,pricing_data):
             pricing_data["dayVolume"],
         )
     )
-    ticker = pricing_data["id"]
-    price = round(pricing_data["price"],3)
-    timestamp = round(pricing_data["timestamp"] / 1000)
-    volume = pricing_data["dayVolume"]
-    if price < 100 or price > 1000:
-        return
     try:
         db[db_table].delete_many({"ticker":ticker,"timestamp":timestamp})
     except Exception:
@@ -265,8 +265,15 @@ def insert_db_gainer(ws,pricing_data):
         ws.close()
 
 def insert_db_loser(ws,pricing_data):
-    db,client = prepare_db()
     db_table = "loser_timeseries"
+    
+    ticker = pricing_data["id"]
+    price = round(pricing_data["price"],3)
+    timestamp = round(pricing_data["timestamp"] / 1000)
+    volume = pricing_data["dayVolume"]
+    if price < 100 or price > 1000:
+        return
+    db,client = prepare_db()
     logging.info(
         "{} {} {} {} {}".format(
             datetime.utcfromtimestamp(pricing_data["timestamp"] / 1000).strftime(
@@ -278,12 +285,6 @@ def insert_db_loser(ws,pricing_data):
             pricing_data["dayVolume"],
         )
     )
-    ticker = pricing_data["id"]
-    price = round(pricing_data["price"],3)
-    timestamp = round(pricing_data["timestamp"] / 1000)
-    volume = pricing_data["dayVolume"]
-    if price < 100 or price > 1000:
-        return
     try:
         db[db_table].delete_many({"ticker":ticker,"timestamp":timestamp})
     except Exception:
