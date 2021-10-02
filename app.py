@@ -269,22 +269,14 @@ def get_gapper():
 @app.route("/volatility")
 def get_volatility():
     tables = ["gainer_timeseries", "loser_timeseries"]
-
     db_conn,client = prepare_db()
-
-    # cursor = db_conn.cursor()
-
     rows = []
-
     tickers = []
-
     for table in tables:
         tickers = []
         table_rows = []
-        # FIXME: code duplication with get_changes and bad perf.
         for ticker in db_conn[table].distinct('ticker'):
             tickers.append(ticker)
-
         for t in tickers:
             query = {
                 "$query": {"ticker": t},
@@ -305,24 +297,27 @@ def get_volatility():
         new_rows = []
         for row in table_rows:
             t = row["ticker"]
-
             five_minutes_ago = datetime.now() - timedelta(minutes=5)
             five_minutes_ago = math.ceil(five_minutes_ago.timestamp())
-
             query = {
-                "$query": {"ticker": t, "timestamp": {"$lt": five_minutes_ago}},
+                "$query": {"ticker": t, "timestamp": {"$lte": five_minutes_ago}},
                 "$orderby": {"timestamp": -1}
             }
             ticker = db_conn[table].find_one(query)
-            if ticker is not None:
-                row["prev_price"] = ticker['price']
-                row["price_change"] = round(
-                    abs(row["cur_price"] - row["prev_price"]), 3)
-                row["prev_price"] = round(row["prev_price"], 3)
-                row["cur_price"] = round(row["cur_price"], 3)
-                new_rows.append(row)
-            else:
-                row["prev_price"] = -1
+            if ticker == None:
+                query = {
+                    "$query": {"ticker": t},
+                    "$orderby": {"timestamp": 1}
+                }
+                ticker = db_conn[table].find_one(query)
+                if ticker is None:
+                    continue
+            row["prev_price"] = ticker['price']
+            row["price_change"] = round(
+                abs(row["cur_price"] - row["prev_price"]), 3)
+            row["prev_price"] = round(row["prev_price"], 3)
+            row["cur_price"] = round(row["cur_price"], 3)
+            new_rows.append(row)
         rows.extend(new_rows)
     rows = sorted(rows, key=lambda row: row.get("price_change"))
     row_ticker = []
