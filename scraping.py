@@ -269,7 +269,7 @@ def insert_db_loser(ws,pricing_data):
     now = datetime.now()
     delta = now - timing[db_table]
 
-    if delta.total_seconds() > 1 * 60:
+    if delta.total_seconds() > 10 * 60:
         logging.info("10 minutes elapsed - refreshing ticker list")
         ws.close()
     ticker = pricing_data["id"]

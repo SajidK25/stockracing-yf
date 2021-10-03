@@ -73,7 +73,7 @@ def get_changes():
 
         # r = cursor.fetchone()
         query = {
-            "$query": {"ticker": t, "timestamp": {"$lt": one_minute_ago}},
+            "$query": {"ticker": t, "timestamp": {"$lte": one_minute_ago}},
             "$orderby": {"timestamp": -1}
         }
         ticker = db_conn[table].find_one(query)
@@ -143,7 +143,7 @@ def get_racing():
 
         # r = cursor.fetchone()
         query = {
-            "$query": {"ticker": t, "timestamp": {"$lt": five_minutes_ago}},
+            "$query": {"ticker": t, "timestamp": {"$lte": five_minutes_ago}},
             "$orderby": {"timestamp": -1}
         }
         ticker = db_conn[table].find_one(query)
@@ -234,7 +234,7 @@ def get_gapper():
 
         # ticker = cursor.fetchone()
         query = {
-            "$query": {"ticker": t, "timestamp": {"$lt": five_minutes_ago}},
+            "$query": {"ticker": t, "timestamp": {"$lte": five_minutes_ago}},
             "$orderby": {"timestamp": -1}
         }
         ticker = db_conn[table].find_one(query)
@@ -297,10 +297,10 @@ def get_volatility():
         new_rows = []
         for row in table_rows:
             t = row["ticker"]
-            five_minutes_ago = datetime.now() - timedelta(minutes=5)
-            five_minutes_ago = math.ceil(five_minutes_ago.timestamp())
+            two_minutes_ago = datetime.now() - timedelta(minutes=2)
+            two_minutes_ago = math.ceil(two_minutes_ago.timestamp())
             query = {
-                "$query": {"ticker": t, "timestamp": {"$lte": five_minutes_ago}},
+                "$query": {"ticker": t, "timestamp": {"$lte": two_minutes_ago}},
                 "$orderby": {"timestamp": -1}
             }
             ticker = db_conn[table].find_one(query)
