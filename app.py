@@ -321,11 +321,15 @@ def get_volatility():
         rows.extend(new_rows)
     rows = sorted(rows, key=lambda row: row.get("price_change"))
     row_ticker = []
-    for index in range(len(rows)):
+    index = 0
+    while True:
+        if index >= len(rows):
+            break
         if rows[index]["ticker"] in row_ticker:
             del rows[index]
         else:
             row_ticker.append(rows[index]["ticker"])
+        index += 1
     client.close()
     return render_template("volatility.html", rows=rows)
 
