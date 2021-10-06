@@ -174,7 +174,8 @@ def get_tickers(session, screener_url, json_dict,db_table):
         "formatted": "true",
         "corsDomain": "finance.yahoo.com",
     }
-
+    size = json_dict["size"]
+    json_dict["size"] = 1
     resp = session.post(
         "https://query1.finance.yahoo.com/v1/finance/screener",
         json=json_dict,
@@ -182,17 +183,35 @@ def get_tickers(session, screener_url, json_dict,db_table):
     )
     logging.info(resp.url)
 
-    json_dict = resp.json()
+    json_dict1 = resp.json()
 
-    result = json_dict.get("finance", dict()).get("result")
+    result = json_dict1.get("finance", dict()).get("result")
     if result is None:
         return []
 
     result = result[0]
 
     count = result.get("count")
+    total = result.get("total")
+    json_dict["size"] = total
+    resp = session.post(
+        "https://query1.finance.yahoo.com/v1/finance/screener",
+        json=json_dict,
+        params=params,
+    )
+    logging.info(resp.url)
+
+    json_dict1 = resp.json()
+
+    result = json_dict1.get("finance", dict()).get("result")
+    if result is None:
+        return []
+
+    result = result[0]
 
     quotes = result.get("quotes")
+    json_dict["size"] = size
+
 
     for quote_dict in quotes:
         symbol = quote_dict.get("symbol")
@@ -346,7 +365,7 @@ def run_loop_winner():
 def run_loop_loser():
     while True:
         run_loop(TOP_LOSER_SCREENER_URL, TOP_LOSER_JSON_DICT, "loser_timeseries")
-
+        # pass
 
 def main():
     logging.basicConfig(
