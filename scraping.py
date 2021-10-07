@@ -218,16 +218,16 @@ def get_tickers(session, screener_url, json_dict,db_table):
         if len(symbol) <= 4:
             tickers.append(symbol)
         
-    db,client = prepare_db()
-    # cursor = db_conn.cursor()
+    # db,client = prepare_db()
+    # # cursor = db_conn.cursor()
 
-    if db_table:
-        # table = db_table
-        # cursor.execute("SELECT DISTINCT ON (ticker) ticker FROM {}".format(table))
-        for r in db[db_table].distinct('ticker'):
-            if r not in tickers:
-                tickers.append(r[0])
-    client.close()
+    # if db_table:
+    #     # table = db_table
+    #     # cursor.execute("SELECT DISTINCT ON (ticker) ticker FROM {}".format(table))
+    #     for r in db[db_table].distinct('ticker'):
+    #         if r not in tickers:
+    #             tickers.append(r[0])
+    # client.close()
     return tickers
 
 
