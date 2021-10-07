@@ -20,9 +20,12 @@
                 <tr>
                     <th>Symbol</th>
                     <th>Price</th>
+                    <th>Previous Price</th>
                     <th>Previous position</th>
                     <th>Current position</th>
                     <th>Gapper</th>
+                    <th>Price Change</th>
+                    <th>Position</th>
                 </tr>
             </thead>
             <tbody>
@@ -30,9 +33,12 @@
                 <tr>
                     <td>{{ row_dict.ticker }}</td>
                     <td>{{ row_dict.cur_price }}</td>
+                    <td>{{ row_dict.prev_price }}</td>
                     <td>{{ row_dict.prev_pos }}</td>
                     <td>{{ row_dict.cur_pos }}</td>
                     <td>{{ row_dict.gapper }}</td>
+                    <td>{{ row_dict.price_change }}</td>
+                    <td>{{ row_dict.position }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -46,7 +52,7 @@
     <script>
         $(document).ready(function () {
             $('#gainers').DataTable({
-                "order" : [[4,"desc"]],
+                "order" : [[7,"asc"]],
                 "pageLength": 10
             });
         });

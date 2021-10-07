@@ -223,8 +223,8 @@ def get_gapper():
     for row in rows:
         t = row["ticker"]
 
-        five_minutes_ago = datetime.now() - timedelta(minutes=5)
-        five_minutes_ago = math.ceil(five_minutes_ago.timestamp())
+        two_minutes_ago = datetime.now() - timedelta(minutes=2)
+        two_minutes_ago = math.ceil(two_minutes_ago.timestamp())
 
         # cursor.execute(
         #     "SELECT price FROM {} WHERE ticker='{}' AND timestamp < {} ORDER BY timestamp DESC LIMIT 1;".format(
@@ -234,7 +234,7 @@ def get_gapper():
 
         # ticker = cursor.fetchone()
         query = {
-            "$query": {"ticker": t, "timestamp": {"$lte": five_minutes_ago}},
+            "$query": {"ticker": t, "timestamp": {"$lte": two_minutes_ago}},
             "$orderby": {"timestamp": -1}
         }
         ticker = db_conn[table].find_one(query)
@@ -259,9 +259,13 @@ def get_gapper():
         row["prev_pos"] = i + 1
 
     for row in rows:
+        row["price_change"] = row["prev_price"] - row["cur_price"]
         row["gapper"] = row["prev_pos"] - row["cur_pos"]
 
-    rows = sorted(rows, key=lambda row: row.get("gapper"))
+    rows = sorted(rows, key=lambda row: row.get("price_change"), reverse=True)
+    for i in range(len(rows)):
+        row = rows[i]
+        row["position"] = i + 1
     client.close()
     return render_template("gapper.html", rows=rows)
 
@@ -297,10 +301,10 @@ def get_volatility():
         new_rows = []
         for row in table_rows:
             t = row["ticker"]
-            two_minutes_ago = datetime.now() - timedelta(minutes=2)
-            two_minutes_ago = math.ceil(two_minutes_ago.timestamp())
+            five_minutes_ago = datetime.now() - timedelta(minutes=5)
+            five_minutes_ago = math.ceil(five_minutes_ago.timestamp())
             query = {
-                "$query": {"ticker": t, "timestamp": {"$lte": two_minutes_ago}},
+                "$query": {"ticker": t, "timestamp": {"$lte": five_minutes_ago}},
                 "$orderby": {"timestamp": -1}
             }
             ticker = db_conn[table].find_one(query)
