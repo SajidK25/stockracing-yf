@@ -193,31 +193,28 @@ def get_tickers(session, screener_url, json_dict,db_table):
 
     count = result.get("count")
     total = result.get("total")
-    json_dict["size"] = total
-    resp = session.post(
-        "https://query1.finance.yahoo.com/v1/finance/screener",
-        json=json_dict,
-        params=params,
-    )
-    logging.info(resp.url)
-
-    json_dict1 = resp.json()
-
-    result = json_dict1.get("finance", dict()).get("result")
-    if result is None:
-        return []
-
-    result = result[0]
-
-    quotes = result.get("quotes")
-    json_dict["size"] = size
-
-
-    for quote_dict in quotes:
-        symbol = quote_dict.get("symbol")
-        if len(symbol) <= 4:
-            tickers.append(symbol)
-        
+    offset = 0
+    while total > 0:
+        json_dict["offset"] = offset
+        json_dict["size"] = 100
+        resp = session.post(
+            "https://query1.finance.yahoo.com/v1/finance/screener",
+            json=json_dict,
+            params=params,
+        )
+        logging.info(resp.url)
+        json_dict1 = resp.json()
+        result = json_dict1.get("finance", dict()).get("result")
+        if result is None:
+            break
+        result = result[0]
+        quotes = result.get("quotes")
+        for quote_dict in quotes:
+            symbol = quote_dict.get("symbol")
+            if len(symbol) <= 4:
+                tickers.append(symbol)
+        offset += 100
+        total -= 100
     # db,client = prepare_db()
     # # cursor = db_conn.cursor()
 
