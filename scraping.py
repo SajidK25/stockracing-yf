@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import base64
+from trading_view import get_analysis
 import configparser
 from datetime import datetime
 from pprint import pprint
@@ -258,13 +259,14 @@ def insert_db_gainer(ws,pricing_data):
         db[db_table].delete_many({"ticker":ticker,"timestamp":timestamp})
     except Exception:
         logging.info(f"Exception occured -1 {Exception}")
-
+    analysis = get_analysis(ticker)
     try:
         db[db_table].insert_one({
             "ticker":ticker,
             "price":price,
             "timestamp":timestamp,
-            "volume":volume
+            "volume":volume,
+            "analysis" : analysis
         })
     except Exception:
         logging.info(f"Exception occured -2 {Exception}")
@@ -311,12 +313,14 @@ def insert_db_loser(ws,pricing_data):
     except Exception:
         print(Exception, "Exception occured -1")
 
+    analysis = get_analysis(ticker)
     try:
         db[db_table].insert_one({
             "ticker":ticker,
             "price":price,
             "timestamp":timestamp,
-            "volume":volume
+            "volume":volume,
+            "analysis" : analysis
         })
     except Exception:
         print(Exception, "Exception occured - 2")

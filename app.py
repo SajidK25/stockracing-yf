@@ -337,6 +337,56 @@ def get_volatility():
     client.close()
     return render_template("volatility.html", rows=rows)
 
+def round_off_values(data:dict):
+    round_off_data = {}
+    for key,value in data.items():
+        if value is None:
+            continue
+        round_off_data[key] = round(value)
+    return round_off_data
+
+
+def analyse():
+    table = "gainer_timeseries"
+    data = request.args.get("data")
+    if data == "losers":
+        table = "loser_timeseries"
+    db_conn,client = prepare_db()
+    rows = []
+    indicators = ["ADX"]
+    tickers = []
+    for ticker in db_conn[table].distinct('ticker'):
+        tickers.append(ticker)
+
+    for t in tickers:
+        query = {
+            "$query": {"ticker": t},
+            "$orderby": {"timestamp": -1}
+        }
+        ticker = db_conn[table].find_one(query)
+        if ticker is not None:
+            if round(ticker['price'], 3) < 100 or round(ticker['price'], 3) > 1000:
+                continue
+            row = ticker
+            row['price'] = round(row['price'])
+            if row["analysis"] is None:
+                continue
+            row["analysis"] = round_off_values(row["analysis"])
+            if all([indicator in row['analysis'].keys() for indicator in indicators]):
+                rows.append(row)
+    client.close()
+    return rows
+
+@app.route("/analysis-adx")
+def get_analysis():
+    rows = analyse()
+    return render_template("analysis-adx.html", rows=rows)
+
+@app.route("/analysis-macd")
+def get_analysis_macd():
+    rows = analyse()
+    return render_template("analysis.html", rows=rows)
+
 
 @app.route("/")
 def index():
