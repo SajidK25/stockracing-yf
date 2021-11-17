@@ -12,7 +12,13 @@
 
 <body>
     <div class="container">
-        <h1>Analysis</h1>
+        <h1>Analysis
+            {% if rows.losers %}
+                - Losers
+                {% else %}
+                - Gainers
+            {% endif %}
+        </h1>
         <div><a href="/analysis-adx?data=gainers">Gainers</a></div>
         <div><a href="/analysis-adx?data=losers">Losers</a></div>
         <table id="analysis" class="table table-striped table-bordered" style="width: 100%">
@@ -21,14 +27,24 @@
                     <th>Symbol</th>
                     <th>Price</th>
                     <th>ADX</th>
+                    {% if rows.losers %}
+                    <th>ADX-DI</th>
+                    {% else %}
+                    <th>ADX+DI</th>
+                    {% endif %}
                 </tr>
             </thead>
             <tbody>
-                {% for row_dict in rows %}
+                {% for row_dict in rows.data %}
                 <tr>
                     <td>{{ row_dict.ticker }}</td>
                     <td>{{ row_dict.price }}</td>
                     <td>{{ row_dict.analysis.ADX }}</td>
+                    {% if rows.losers %}
+                        <td>{{ row_dict.analysis["ADX-DI"] }}</td>
+                    {% else %}
+                        <td>{{ row_dict.analysis["ADX+DI"] }}</td>
+                    {% endif %}
                 </tr>
                 {% endfor %}
             </tbody>

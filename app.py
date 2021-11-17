@@ -380,7 +380,14 @@ def analyse():
 @app.route("/analysis-adx")
 def get_analysis():
     rows = analyse()
-    return render_template("analysis-adx.html", rows=rows)
+    data = {
+        "data" : rows,
+        "losers" : False
+    }
+    args = request.args.get("data")
+    if args == "losers":
+        data["losers"] = True
+    return render_template("analysis-adx.html", rows=data)
 
 @app.route("/analysis-macd")
 def get_analysis_macd():
