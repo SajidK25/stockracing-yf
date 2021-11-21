@@ -389,6 +389,18 @@ def get_analysis():
         data["losers"] = True
     return render_template("analysis-adx.html", rows=data)
 
+@app.route("/analysis-rsi")
+def get_analysis_rsi():
+    rows = analyse()
+    data = {
+        "data" : rows,
+        "losers" : False
+    }
+    args = request.args.get("data")
+    if args == "losers":
+        data["losers"] = True
+    return render_template("analysis-rsi.html", rows=data)
+
 @app.route("/analysis-macd")
 def get_analysis_macd():
     rows = analyse()
