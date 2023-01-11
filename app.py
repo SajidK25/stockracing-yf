@@ -335,6 +335,7 @@ def get_volatility():
             row_ticker.append(rows[index]["ticker"])
         index += 1
     client.close()
+    print(rows)
     return render_template("volatility.html", rows=rows)
 
 def round_off_values(data:dict):

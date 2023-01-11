@@ -226,6 +226,7 @@ def get_tickers(session, screener_url, json_dict,db_table):
     #         if r not in tickers:
     #             tickers.append(r[0])
     # client.close()
+    print(tickers)
     return tickers
 
 
@@ -352,6 +353,7 @@ def run_loop(screener_url, json_dict, db_table):
             logging.error(e)
             continue
         print(tickers)
+        
         timing[db_table] = datetime.now()
         if db_table == "gainer_timeseries":
             yliveticker.YLiveTicker(on_ticker=insert_db_gainer, ticker_names=tickers,on_close=onexit,on_error=onexit)
